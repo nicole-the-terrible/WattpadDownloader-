@@ -30,4 +30,13 @@ def download_webpage(url):
         print("There was a problem: %s % (exc)")
         return None
 
+def extract_data(json):
+    title = json.get('title', '')
+    author = json.get('user', '')
+    cover = json.get('cover', '')
+    tags = json.get('tags', '')
+    chapters = json.get('part', '')
+    summary = json.get('description', '')
     
+    return title, author, cover, tags, chapters, summary
+
