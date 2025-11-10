@@ -12,9 +12,9 @@ import pyperclip
 
 apiV2_url = "https://www.wattpad.com/apiv2/"
 api_V3_url = "https://www.wattpad.com/apiv3/"
-error_msg = "ERROR:check the url, for valid id"
+error_message = "ERROR:check the url, for valid id"
 
-def get_chap_id(url):
+def get_chapter_id(url):
     search_id = re.compile(r'\d{5,}')
     id_match = search_id.search(url)
     if id_match:
@@ -97,3 +97,33 @@ def save_epub_file(html_file, story_title, cover):
 
     os.remove(cover_image)
     print(f"Saved {output_file}")
+    
+def main(url):
+    story_id = get_chapter_id(url)
+    if not story_id:
+        print(error_message)
+        return
+
+    StoryInfo = api_V3_url + f"stories/{story_id}?drafts=0&mature=1&include_deleted=1&fields=id,title,createDate,modifyDate,description,url,firstPublishedPart,cover,language,user(name,username,avatar,location,numStoriesPublished,numFollowing,numFollowers,twitter),completed,numParts,lastPublishedPart,parts(id,title,length,url,deleted,draft,createDate),tags,storyLanguage,copyright"
+    json_data  = requests.get(StoryInfo , headers={'User-Agent': 'Mozilla/5.0'}).json()
+    try:
+        if json_data.get('result') == 'ERROR':
+            error_message = json_data.get('message', 'Unknown error')
+            print(f"Error: {error_message}")
+            print(error_message)
+            return
+        
+        if json_data.get('error_type') :
+            error_message = json_data.get('message', 'Unknown error')
+            print(f"Error: {error_message}")
+            print(error_message)
+            return
+        
+    
+        if json_data.get('result') == 'ERROR':
+            error_message = json_data.get('message', 'Unknown error')
+            print(f"API Error: {error_message}")
+            return
+    except Exception as exc:
+        print(f"Error retrieving JSON data from the API: {exc}")
+        return
